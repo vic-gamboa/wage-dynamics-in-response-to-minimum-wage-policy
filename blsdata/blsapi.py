@@ -1,10 +1,10 @@
-import requests
-import json
 import csv
 import time
 import pandas as pd
 import os
 from dotenv import load_dotenv
+import requests
+import json
 
 load_dotenv()
 
@@ -46,9 +46,8 @@ def parse_bls_response(json_data, series_df):
     all_rows = []
 
     id_to_state = dict(zip(series_df["Series ID"], series_df["State"]))
-    state = id_to_state[series_id]
 
-    for series in json_data["Results", "series"]:
+    for series in json_data["Results"]["series"]:
         series_id = series['seriesID']
         state = id_to_state.get(series_id, "Unknown")
         
@@ -72,6 +71,9 @@ def parse_bls_response(json_data, series_df):
 # write to csv
 
 def save_to_csv(rows, filename):
+    if not rows:
+        print("No Data to Save")
+        return
     keys = rows[0].keys()
     with open(filename, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=keys)
@@ -87,3 +89,6 @@ if __name__ == "__main__":
     parsed = parse_bls_response(data, series_df)
     save_to_csv(parsed, OUTPUT_FILE)
     print(f"Saved {len(parsed)} records to {OUTPUT_FILE}")
+    raw = fetch_bls_data(SERIES_IDS, START_YEAR, END_YEAR)
+    # print(json.dumps(raw, indent=2))  
+

@@ -1,15 +1,18 @@
 import unittest
 from blsapi import fetch_bls_data
+import json
 
 class TestFetchBLSData(unittest.TestCase):
     def test_valid_series(self):
         series_ids = ['CUUR0000SA0']
         result = fetch_bls_data(series_ids, "2022", "2022")
 
+        print(json.dumps(result, indent=2))
         self.assertIn("Results", result)
         self.assertIn("series", result["Results"])
         self.assertGreater(len(result["Results"]["series"]), 0)
         self.assertEqual(result["Results"]["series"][0]["seriesID"], "CUUR0000SA0")
+    
 
     def test_invalid_series(self):
         series_ids = ['FAKE0000BAD']
